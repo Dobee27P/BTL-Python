@@ -1,0 +1,115 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Top NBA</title>
+    <link href="aset/jquery-confirm.min.css" rel="stylesheet" />
+    <link href="aset/giaodien.css" rel="stylesheet" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+    <!--<script src="aset/mycode.js"></script>-->
+    <style>
+    </style>
+</head>
+<body>
+    <div id="header">
+        <img src="https://cdn.bleacherreport.net/images/team_logos/328x328/nba.png" alt="NBA" />
+        <img src="https://image.roku.com/blog/wp-content/uploads/2023/01/NBA_SOS_ROKU_1200x628.jpg" alt="NBA" />
+        <img src="https://assets-global.website-files.com/616e0c91a533fe6ac38a737f/655f9cfb398fb91ba92913d9_nba-creators-banner1.png" alt="NBA" />
+        <img src="https://www.serfadu.com/wp-content/uploads/2020/10/NBA.png" alt="NBA" />
+        <img src="https://library.sportingnews.com/styles/crop_style_16_9_desktop/s3/2024-04/GFX-1358%20FTR%20for%20SN%20end%20of%20season%20NBA%20awards.jpg?h=920929c4&itok=Ib98Wg-K" alt="NBA" />
+        <img src="https://cdn.nba.com/manage/2022/07/blazers-2022-summer-league-champs.jpg?w=735&h=413" alt="NBA" />
+        <img src="https://cdn.nba.com/manage/2022/07/banchero-smith-holmgren-murray-split.jpg" alt="NBA" />
+    </div>
+
+    <div id="content-container">
+        <div class="side-div">
+            <img src="" />
+        </div>
+        <div id="table-container">
+            <!-- Bảng HTML sẽ được chèn vào đây bởi JavaScript -->
+        </div>
+        <div class="side-div"></div>
+
+        <div id="team-details" style="width: 80%; margin: auto; border: 0.5px solid #ccc; border-radius: 5px; background-color: rgba(240, 240, 240, 0.2); padding: 20px; display: none;">
+            <!-- Bảng chi tiết sẽ được hiển thị ở đây -->
+        </div>
+    </div>
+
+    <div style="width: 80%; margin: auto; border: 0.5px solid #ccc; border-radius: 5px; background-color: rgba(240, 240, 240, 0.2);">
+        <canvas id="pointsChart"></canvas>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            function getData() {
+                fetch('api.aspx')
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        let tableHtml = `<table id="teamTable">
+                                    <thead>
+                                        <tr>
+                                            <th>Team Name</th>
+                                            <th>Abbreviation</th>
+                                            <th>City</th>
+                                            <th>Conference</th>
+                                            <th>Division</th>
+                                            <th>Score</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>`;
+
+                        data.forEach(team => {
+                            tableHtml += `
+                                        <tr>
+                                            <td>${team.Full_Name}</td>
+                                            <td>${team.Abbreviation}</td>
+                                            <td>${team.City}</td>
+                                            <td>${team.Conference}</td>
+                                            <td>${team.Division}</td>
+                                            <td>${team.Score.toFixed(2)}</td>
+                                        </tr>`;
+                        });
+
+                        tableHtml += `</tbody></table>`;
+                        document.getElementById("table-container").innerHTML = tableHtml;
+                        const colors = ['#1E90FF', '#FF5733', '#C70039', '#900C3F', '#581845', '#2F4F4F']; 
+                        var ctx = document.getElementById('pointsChart').getContext('2d');
+                        var pointsChart = new Chart(ctx, {
+                            type: 'bar',
+                            data: {
+                                labels: data.map(team => team.Full_Name),
+                                datasets: [{
+                                    label: 'Points',
+                                    data: data.map(team => team.Score),
+                                    backgroundColor: colors,
+                                    borderColor: 'rgba(0, 0, 0, 0.5)',
+                                    borderWidth: 1
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                scales: {
+                                    y: {
+                                        beginAtZero: true
+                                    }
+                                }
+                            }
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+            }
+            getData();
+        });
+    </script>
+</body>
+</html>
