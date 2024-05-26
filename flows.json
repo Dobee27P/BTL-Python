@@ -1,0 +1,189 @@
+[
+    {
+        "id": "f5f68f8d977b4340",
+        "type": "tab",
+        "label": "Flow 3",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "588b4359e3f06bba",
+        "type": "inject",
+        "z": "f5f68f8d977b4340",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 100,
+        "y": 100,
+        "wires": [
+            [
+                "cf1c57211e643ca8"
+            ]
+        ]
+    },
+    {
+        "id": "924f21b9f1718b5b",
+        "type": "function",
+        "z": "f5f68f8d977b4340",
+        "name": "function",
+        "func": "var sqlStatements = [];\nvar teamData = msg.payload.teams.data;\n\nteamData.forEach(function (team) {\n    node.warn(team);\n    var sql = `INSERT INTO [dbo].[Teams] ([abbreviation], [city], [conference], [division], [full_name], [name]) VALUES ('${team.abbreviation.replace(/'/g, \"''\")}', '${team.city.replace(/'/g, \"''\")}', '${team.conference.replace(/'/g, \"''\")}', '${team.division.replace(/'/g, \"''\")}', '${team.full_name.replace(/'/g, \"''\")}', '${team.name.replace(/'/g, \"''\")}')`;\n\n    sqlStatements.push(sql);\n});\n\nmsg.payload = sqlStatements.join('; '); // Join the SQL statements into a single string\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 420,
+        "y": 360,
+        "wires": [
+            [
+                "c856b7765ebe0553"
+            ]
+        ]
+    },
+    {
+        "id": "cf1c57211e643ca8",
+        "type": "http request",
+        "z": "f5f68f8d977b4340",
+        "name": "",
+        "method": "GET",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "http://127.0.0.1:5000/teams",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 250,
+        "y": 140,
+        "wires": [
+            [
+                "dd83988591780d51"
+            ]
+        ]
+    },
+    {
+        "id": "c856b7765ebe0553",
+        "type": "MSSQL",
+        "z": "f5f68f8d977b4340",
+        "mssqlCN": "51f9cdf3a2d2be8b",
+        "name": "",
+        "outField": "payload",
+        "returnType": 0,
+        "throwErrors": 1,
+        "query": "",
+        "modeOpt": "queryMode",
+        "modeOptType": "query",
+        "queryOpt": "payload",
+        "queryOptType": "editor",
+        "paramsOpt": "queryParams",
+        "paramsOptType": "none",
+        "rows": "rows",
+        "rowsType": "msg",
+        "parseMustache": true,
+        "params": [],
+        "x": 600,
+        "y": 420,
+        "wires": [
+            [
+                "c7ec510d77310886"
+            ]
+        ]
+    },
+    {
+        "id": "dd83988591780d51",
+        "type": "json",
+        "z": "f5f68f8d977b4340",
+        "name": "",
+        "property": "payload",
+        "action": "",
+        "pretty": false,
+        "x": 370,
+        "y": 200,
+        "wires": [
+            [
+                "924f21b9f1718b5b"
+            ]
+        ]
+    },
+    {
+        "id": "c7ec510d77310886",
+        "type": "debug",
+        "z": "f5f68f8d977b4340",
+        "name": "debug 6",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 800,
+        "y": 340,
+        "wires": []
+    },
+    {
+        "id": "8996a6374075f2c6",
+        "type": "inject",
+        "z": "f5f68f8d977b4340",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 240,
+        "y": 640,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "51f9cdf3a2d2be8b",
+        "type": "MSSQL-CN",
+        "tdsVersion": "7_4",
+        "name": "MSSQL",
+        "server": "vengann\\SQLEXPRESS",
+        "port": "1433",
+        "encyption": true,
+        "trustServerCertificate": true,
+        "database": "NBA",
+        "useUTC": true,
+        "connectTimeout": "15000",
+        "requestTimeout": "15000",
+        "cancelTimeout": "5000",
+        "pool": "5",
+        "parseJSON": false,
+        "enableArithAbort": true,
+        "readOnlyIntent": false
+    }
+]
